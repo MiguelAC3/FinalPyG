@@ -1,0 +1,34 @@
+pipeline {
+    agent any
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Build & Test') {
+            steps {
+                bat 'mvnw clean package'
+            }
+        }
+        
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    withSonarQubeEnv('MiServidorSonar') {
+                        bat 'mvnw sonar:sonar'
+                    }
+                }
+            }
+        }
+        
+        stage('Deploy to Tomcat') {
+            steps {
+                deploy adapters: [tomcat9(credentialsId: 'tomcat-creds', url: 'http://localhost:8081')], 
+                       war: 'target/*.war'
+            }
+        }
+    }
+}
