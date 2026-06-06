@@ -16,17 +16,20 @@ pipeline {
             }
         }
         
-        stage('SonarQube Analysis') {
-            steps {
-                script {
-                    withSonarQubeEnv('MiServidorSonar') {
-                        dir('pyapi') {
-                            bat '.\\mvnw.cmd sonar:sonar'
-                        }
-                    }
+stage('SonarQube Analysis') {
+    steps {
+        script {
+            // Referenciamos el servidor que ya creamos en 'Manage Jenkins > System'
+            withSonarQubeEnv('MiServidorSonar') {
+                dir('pyapi') {
+                    // El comando para Windows usando el wrapper de Maven
+                    // Asegúrate de que el projectKey coincida con el que creaste en SonarQube
+                    bat '.\\mvnw.cmd sonar:sonar -Dsonar.projectKey=pyapi'
                 }
             }
         }
+    }
+}
         
         stage('Deploy to Tomcat') {
             steps {
