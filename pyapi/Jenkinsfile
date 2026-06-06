@@ -10,7 +10,9 @@ pipeline {
         
         stage('Build & Test') {
             steps {
-                bat 'mvnw clean package'
+                dir('pyapi') {
+                    bat '.\\mvnw.cmd clean package'
+                }
             }
         }
         
@@ -18,7 +20,9 @@ pipeline {
             steps {
                 script {
                     withSonarQubeEnv('MiServidorSonar') {
-                        bat 'mvnw sonar:sonar'
+                        dir('pyapi') {
+                            bat '.\\mvnw.cmd sonar:sonar'
+                        }
                     }
                 }
             }
@@ -26,8 +30,10 @@ pipeline {
         
         stage('Deploy to Tomcat') {
             steps {
-                deploy adapters: [tomcat9(credentialsId: 'tomcat-creds', url: 'http://localhost:8081')], 
-                       war: 'target/*.war'
+                dir('pyapi') {
+                    deploy adapters: [tomcat9(credentialsId: 'tomcat-creds', url: 'http://localhost:8081')], 
+                           war: 'target/*.war'
+                }
             }
         }
     }
