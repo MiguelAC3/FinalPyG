@@ -50,12 +50,18 @@ pipeline {
         }
     }
 
-    // ✅ NUEVO: correos de éxito y fallo
     post {
         failure {
             emailext(
                 subject: "❌ FALLIDO: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                 body: "Falló en: ${env.STAGE_NAME}\nVer detalles: ${env.BUILD_URL}",
+                to: 'miguelcalleparra34@gmail.com'
+            )
+        }
+        aborted {
+            emailext(
+                subject: "⚠️ ABORTADO: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: "El pipeline fue abortado por Quality Gate.\nVer detalles: ${env.BUILD_URL}",
                 to: 'miguelcalleparra34@gmail.com'
             )
         }
