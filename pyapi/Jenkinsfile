@@ -16,28 +16,55 @@ pipeline {
             }
         }
         
-stage('SonarQube Analysis') {
-    steps {
-        script {
-            // Referenciamos el servidor que ya creamos en 'Manage Jenkins > System'
-            withSonarQubeEnv('MiServidorSonar') {
-                dir('pyapi') {
-                    // El comando para Windows usando el wrapper de Maven
-                    // Asegúrate de que el projectKey coincida con el que creaste en SonarQube
-                    bat '.\\mvnw.cmd sonar:sonar -Dsonar.projectKey=pyapi'
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    withSonarQubeEnv('MiServidorSonar') {
+                        dir('pyapi') {
+                            bat '.\\mvnw.cmd sonar:sonar'
+                        }
+                    }
                 }
             }
         }
-    }
-}
+
+        // ✅ NUEVO: detiene el pipeline si SonarQube falla
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
         
         stage('Deploy to Tomcat') {
             steps {
                 dir('pyapi') {
-                    deploy adapters: [tomcat9(credentialsId: 'tomcat-creds', url: 'http://localhost:8081')], 
-                           war: 'target/*.war'
+                    deploy adapters: [tomcat9(
+                        credentialsId: 'tomcat-creds', 
+                        url: 'http://localhost:8081'
+                    )], 
+                    war: 'target/*.war'
                 }
             }
+        }
+    }
+
+    // ✅ NUEVO: correos de éxito y fallo
+    post {
+        failure {
+            emailext(
+                subject: "❌ FALLIDO: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: "Falló en: ${env.STAGE_NAME}\nVer detalles: ${env.BUILD_URL}",
+                to: 'miguelcalleparra34@gmail.com'
+            )
+        }
+        success {
+            emailext(
+                subject: "✅ Deploy exitoso: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: "El artefacto fue desplegado correctamente en Tomcat.",
+                to: 'miguelcalleparra34@gmail.com'
+            )
         }
     }
 }
