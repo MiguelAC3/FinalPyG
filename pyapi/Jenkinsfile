@@ -1,6 +1,11 @@
 pipeline {
     agent any
     
+    environment {
+        SONAR_PROJECT_KEY = 'api:pyapi'
+        SONAR_URL = 'http://localhost:9000'
+    }
+    
     stages {
         stage('Checkout') {
             steps {
