@@ -54,22 +54,61 @@ pipeline {
         failure {
             emailext(
                 subject: "❌ FALLIDO: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: "Falló en: ${env.STAGE_NAME}\nVer detalles: ${env.BUILD_URL}",
-                to: 'miguelcalleparra34@gmail.com'
+                body: """
+                    <h2>El pipeline falló</h2>
+                    <p><b>Proyecto:</b> ${env.JOB_NAME}</p>
+                    <p><b>Build:</b> #${env.BUILD_NUMBER}</p>
+                    <p><b>Estado Quality Gate:</b> ${env.QUALITY_GATE_STATUS ?: 'No ejecutado'}</p>
+                    <p><b>Ver issues en SonarQube:</b> 
+                        <a href="${env.SONAR_URL}/dashboard?id=${env.SONAR_PROJECT_KEY}">
+                            Ver reporte completo
+                        </a>
+                    </p>
+                    <p><b>Ver log en Jenkins:</b> 
+                        <a href="${env.BUILD_URL}">${env.BUILD_URL}</a>
+                    </p>
+                """,
+                to: 'miguelcalleparra34@gmail.com',
+                mimeType: 'text/html'
             )
         }
         aborted {
             emailext(
                 subject: "⚠️ ABORTADO: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: "El pipeline fue abortado por Quality Gate.\nVer detalles: ${env.BUILD_URL}",
-                to: 'miguelcalleparra34@gmail.com'
+                body: """
+                    <h2>El pipeline fue abortado</h2>
+                    <p><b>Proyecto:</b> ${env.JOB_NAME}</p>
+                    <p><b>Build:</b> #${env.BUILD_NUMBER}</p>
+                    <p><b>Estado Quality Gate:</b> ${env.QUALITY_GATE_STATUS ?: 'No ejecutado'}</p>
+                    <p><b>Ver issues en SonarQube:</b> 
+                        <a href="${env.SONAR_URL}/dashboard?id=${env.SONAR_PROJECT_KEY}">
+                            Ver reporte completo
+                        </a>
+                    </p>
+                    <p><b>Ver log en Jenkins:</b> 
+                        <a href="${env.BUILD_URL}">${env.BUILD_URL}</a>
+                    </p>
+                """,
+                to: 'miguelcalleparra34@gmail.com',
+                mimeType: 'text/html'
             )
         }
         success {
             emailext(
                 subject: "✅ Deploy exitoso: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: "El artefacto fue desplegado correctamente en Tomcat.",
-                to: 'miguelcalleparra34@gmail.com'
+                body: """
+                    <h2>Deploy exitoso</h2>
+                    <p><b>Proyecto:</b> ${env.JOB_NAME}</p>
+                    <p><b>Build:</b> #${env.BUILD_NUMBER}</p>
+                    <p><b>El artefacto fue desplegado correctamente en Tomcat.</b></p>
+                    <p><b>Ver reporte SonarQube:</b> 
+                        <a href="${env.SONAR_URL}/dashboard?id=${env.SONAR_PROJECT_KEY}">
+                            Ver reporte completo
+                        </a>
+                    </p>
+                """,
+                to: 'miguelcalleparra34@gmail.com',
+                mimeType: 'text/html'
             )
         }
     }
