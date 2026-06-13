@@ -112,23 +112,23 @@ public class AuthController {
 		));
 	}
 
-@PostMapping("/createrandomuser")
-public ResponseEntity<UserEntity> createRandomUser() {
-    // 2. Generar una contraseña aleatoria y segura
-    byte[] randomBytes = new byte[16];
-    SECURE_RANDOM.nextBytes(randomBytes);
-    String secureRandomPassword = Base64.getEncoder().encodeToString(randomBytes);
+// @PostMapping("/createrandomuser")
+// public ResponseEntity<UserEntity> createRandomUser() {
+//     // 2. Generar una contraseña aleatoria y segura
+//     byte[] randomBytes = new byte[16];
+//     SECURE_RANDOM.nextBytes(randomBytes);
+//     String secureRandomPassword = Base64.getEncoder().encodeToString(randomBytes);
 
-    // 3. Crear el usuario con datos aleatorios
-    String randomSuffix = UUID.randomUUID().toString().substring(0, 8);
-    UserEntity user = new UserEntity();
-    user.setUsername("user_" + randomSuffix);
+//     // 3. Crear el usuario con datos aleatorios
+//     String randomSuffix = UUID.randomUUID().toString().substring(0, 8);
+//     UserEntity user = new UserEntity();
+//     user.setUsername("user_" + randomSuffix);
     
-    // 4. Codificar la contraseña antes de guardarla
-    user.setPassword(passwordEncoder.encode(secureRandomPassword));
+//     // 4. Codificar la contraseña antes de guardarla
+//     user.setPassword(passwordEncoder.encode(secureRandomPassword));
     
-    // 5. Guardar y retornar explícitamente el tipo UserEntity
-    UserEntity saved = userRepository.save(user);
-    return ResponseEntity.status(HttpStatus.CREATED).body(saved);
-}
+//     // 5. Guardar y retornar explícitamente el tipo UserEntity
+//     UserEntity saved = userRepository.save(user);
+//     return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+// }
 }
