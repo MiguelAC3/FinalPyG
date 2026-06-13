@@ -105,6 +105,4 @@ public class AuthController {
 				"tokenType", "Bearer"
 		));
 	}
-
-
 }
