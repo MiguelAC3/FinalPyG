@@ -106,22 +106,15 @@ public class AuthController {
 		));
 	}
 
-	@PostMapping("/createRandomUser")
-	public ResponseEntity<?> createRandomUser() {
-
-		UserEntity user = new UserEntity();
-
-		long id = System.currentTimeMillis();
-		user.setId(id);
-		user.setUsername("user_" + id);
-		user.setPassword(passwordEncoder.encode("TempPassword123"));
-
-		UserEntity saved = userRepository.save(user);
-
-		return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
-				"message", "Random user created",
-				"id", saved.getId(),
-				"username", saved.getUsername()
-		));
-	}
+	@PostMapping("/createrandomuser")
+		public ResponseEntity<?> createRandomUser() {
+			// Generar datos aleatorios de forma segura (ej. usando UUID o una librería)
+			String randomSuffix = java.util.UUID.randomUUID().toString().substring(0, 8);
+			UserEntity user = new UserEntity();
+			user.setUsername("user_" + randomSuffix);
+			user.setPassword(passwordEncoder.encode("Password123!")); // Usando el encoder inyectado
+			
+			UserEntity saved = userRepository.save(user);
+			return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+		}
 }
