@@ -1,6 +1,7 @@
 package api.pyapi.RestControllers;
 
 import java.util.Map;
+import java.util.UUID;
 
 import jakarta.validation.Valid;
 
@@ -26,7 +27,7 @@ import java.util.Base64;
 @RequestMapping("/auth")
 public class AuthController {
 
-	// private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+	private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
@@ -111,44 +112,25 @@ public class AuthController {
 		));
 	}
 
-	// @PostMapping("/createrandomuser")
-	// public ResponseEntity<UserEntity> createRandomUser() {
-	// 	// 2. Generar una contraseña aleatoria y segura
-	// 	byte[] randomBytes = new byte[16];
-	// 	SECURE_RANDOM.nextBytes(randomBytes);
-	// 	String secureRandomPassword = Base64.getEncoder().encodeToString(randomBytes);
-
-	// 	// 3. Crear el usuario con datos aleatorios
-	// 	String randomSuffix = UUID.randomUUID().toString().substring(0, 8);
-	// 	UserEntity user = new UserEntity();
-	// 	user.setUsername("user_" + randomSuffix);
-		
-	// 	// 4. Codificar la contraseña antes de guardarla
-	// 	user.setPassword(passwordEncoder.encode(secureRandomPassword));
-		
-	// 	// 5. Guardar y retornar explícitamente el tipo UserEntity
-	// 	UserEntity saved = userRepository.save(user);
-	// 	return ResponseEntity.status(HttpStatus.CREATED).body(saved);
-	// }
-
 	@PostMapping("/createrandomuser")
-    public ResponseEntity<?> createRandomUser() { // ERROR 1: Uso de wildcard (?)
-        
-        // ERROR 2: Contraseña hardcodeada (Security Blocker)
-        String pass = "Password123!"; 
-        
-        // ERROR 3: Crear instancia de SecureRandom dentro del método (Reliability - High)
-        java.security.SecureRandom random = new java.security.SecureRandom();
-        byte[] bytes = new byte[16];
-        random.nextBytes(bytes);
-        String securePassword = java.util.Base64.getEncoder().encodeToString(bytes);
+	public ResponseEntity<UserEntity> createRandomUser() {
+		// 2. Generar una contraseña aleatoria y segura
+		byte[] randomBytes = new byte[16];
+		SECURE_RANDOM.nextBytes(randomBytes);
+		String secureRandomPassword = Base64.getEncoder().encodeToString(randomBytes);
 
-        UserEntity user = new UserEntity();
-        user.setUsername("user_" + java.util.UUID.randomUUID().toString().substring(0, 8));
-        user.setPassword(passwordEncoder.encode(pass)); 
-        
-        UserEntity saved = userRepository.save(user);
-        
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
-    }
+		// 3. Crear el usuario con datos aleatorios
+		String randomSuffix = UUID.randomUUID().toString().substring(0, 8);
+		UserEntity user = new UserEntity();
+		user.setUsername("user_" + randomSuffix);
+		
+		// 4. Codificar la contraseña antes de guardarla
+		user.setPassword(passwordEncoder.encode(secureRandomPassword));
+		
+		// 5. Guardar y retornar explícitamente el tipo UserEntity
+		UserEntity saved = userRepository.save(user);
+		return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+	}
+
+
 }
