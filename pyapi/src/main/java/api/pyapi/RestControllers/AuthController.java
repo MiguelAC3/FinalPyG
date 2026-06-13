@@ -106,25 +106,5 @@ public class AuthController {
 		));
 	}
 
-	@PostMapping("/createrandomuser")
-    public ResponseEntity<?> createRandomUser() { // ERROR 1: Uso de wildcard (?)
-        
-        // ERROR 2: Contraseña hardcodeada (Security Blocker)
-        String pass = "Password123!"; 
-        
-        // ERROR 3: Crear instancia de SecureRandom dentro del método (Reliability - High)
-        java.security.SecureRandom random = new java.security.SecureRandom();
-        byte[] bytes = new byte[16];
-        random.nextBytes(bytes);
-        String securePassword = java.util.Base64.getEncoder().encodeToString(bytes);
-
-        UserEntity user = new UserEntity();
-        user.setUsername("user_" + java.util.UUID.randomUUID().toString().substring(0, 8));
-        user.setPassword(passwordEncoder.encode(pass)); 
-        
-        UserEntity saved = userRepository.save(user);
-        
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
-    }
 
 }
