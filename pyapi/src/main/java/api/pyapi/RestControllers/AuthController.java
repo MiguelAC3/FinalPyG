@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import api.pyapi.DTO.RefreshTokenDTO;
+import api.pyapi.DTO.SignupDTO;
 import api.pyapi.DTO.UserLoginDTO;
 import api.pyapi.Entities.UserEntity;
 import api.pyapi.Repository.UserRepository;
@@ -49,15 +50,18 @@ public class AuthController {
 	}
 
 	@PostMapping("/signup")
-	public ResponseEntity<?> signup(@Valid @RequestBody UserEntity request) {
+	public ResponseEntity<Map<String, Object>> signup(@Valid @RequestBody SignupDTO request) {
 		if (userRepository.existsById(request.getId())) {
-			return ResponseEntity.status(HttpStatus.CONFLICT).body("User id already exists");
+			return ResponseEntity.status(HttpStatus.CONFLICT)
+					.body(Map.of(KEY_MESSAGE, "User id already exists"));
 		}
 
-		request.setUsername(request.getUsername().trim());
-		request.setPassword(passwordEncoder.encode(request.getPassword()));
+		UserEntity user = new UserEntity();
+		user.setId(request.getId());
+		user.setUsername(request.getUsername().trim());
+		user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-		UserEntity saved = userRepository.save(request);
+		UserEntity saved = userRepository.save(user);
 		String accessToken = jwtService.generateAccessToken(saved.getId());
 		String refreshToken = jwtService.generateRefreshToken(saved.getId());
 
