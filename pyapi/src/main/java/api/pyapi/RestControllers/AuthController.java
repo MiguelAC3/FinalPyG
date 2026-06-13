@@ -1,7 +1,6 @@
 package api.pyapi.RestControllers;
 
 import java.util.Map;
-import java.util.UUID;
 
 import jakarta.validation.Valid;
 
@@ -19,24 +18,10 @@ import api.pyapi.DTO.UserLoginDTO;
 import api.pyapi.Entities.UserEntity;
 import api.pyapi.Repository.UserRepository;
 import api.pyapi.Security.JwtService;
-import java.security.SecureRandom;
-import java.util.Base64;
-
 
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-
-	// ✅ Constantes para evitar literales duplicados
-	private static final String KEY_MESSAGE       = "message";
-	private static final String KEY_ID            = "id";
-	private static final String KEY_USERNAME      = "username";
-	private static final String KEY_ACCESS_TOKEN  = "accessToken";
-	private static final String KEY_REFRESH_TOKEN = "refreshToken";
-	private static final String KEY_TOKEN_TYPE    = "tokenType";
-	private static final String BEARER            = "Bearer";
-
-	private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
@@ -62,13 +47,13 @@ public class AuthController {
 		String refreshToken = jwtService.generateRefreshToken(saved.getId());
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
-				KEY_MESSAGE,       "User created",
-				KEY_ID,            saved.getId(),
-				KEY_USERNAME,      saved.getUsername(),
-				KEY_ACCESS_TOKEN,  accessToken,
-				KEY_REFRESH_TOKEN, refreshToken,
-				KEY_TOKEN_TYPE,    BEARER
-		));
+				"message", "User created",
+				"id", saved.getId(),
+				"username", saved.getUsername(),
+				"accessToken", accessToken,
+				"refreshToken", refreshToken,
+				"tokenType", "Bearer"
+            ));
 	}
 
 	@PostMapping("/login")
@@ -82,12 +67,12 @@ public class AuthController {
 		String refreshToken = jwtService.generateRefreshToken(user.getId());
 
 		return ResponseEntity.ok(Map.of(
-				KEY_MESSAGE,       "Login successful",
-				KEY_ID,            user.getId(),
-				KEY_USERNAME,      user.getUsername(),
-				KEY_ACCESS_TOKEN,  accessToken,
-				KEY_REFRESH_TOKEN, refreshToken,
-				KEY_TOKEN_TYPE,    BEARER
+				"message", "Login successful",
+				"id", user.getId(),
+				"username", user.getUsername(),
+				"accessToken", accessToken,
+				"refreshToken", refreshToken,
+				"tokenType", "Bearer"
 		));
 	}
 
@@ -114,37 +99,42 @@ public class AuthController {
 		String newRefreshToken = jwtService.generateRefreshToken(userId);
 
 		return ResponseEntity.ok(Map.of(
-				KEY_MESSAGE,       "Token refreshed",
-				KEY_ACCESS_TOKEN,  newAccessToken,
-				KEY_REFRESH_TOKEN, newRefreshToken,
-				KEY_TOKEN_TYPE,    BEARER
+				"message", "Token refreshed",
+				"accessToken", newAccessToken,
+				"refreshToken", newRefreshToken,
+				"tokenType", "Bearer"
 		));
 	}
 
-	@PostMapping("/createrandomuser")
-	public ResponseEntity<Map<String, Object>> createRandomUser() {
-		byte[] randomBytes = new byte[16];
-		SECURE_RANDOM.nextBytes(randomBytes);
-		String secureRandomPassword = Base64.getEncoder().encodeToString(randomBytes);
+@PostMapping("/createrandomuser")
+public ResponseEntity<?> createRandomUser() {
 
-		String randomSuffix = UUID.randomUUID().toString().substring(0, 8);
+    // ERROR 1: Contraseña hardcodeada (Security - Blocker)
+    String pass = "Password123!";
 
-		UserEntity user = new UserEntity();
-		user.setId(System.currentTimeMillis());
-		user.setUsername("user_" + randomSuffix);
-		user.setPassword(passwordEncoder.encode(secureRandomPassword));
+    // ERROR 2: SecureRandom instanciado dentro del método (Reliability - High)
+    java.security.SecureRandom random = new java.security.SecureRandom();
+    byte[] bytes = new byte[16];
+    random.nextBytes(bytes);
 
-		UserEntity saved = userRepository.save(user);
-		String accessToken = jwtService.generateAccessToken(saved.getId());
-		String refreshToken = jwtService.generateRefreshToken(saved.getId());
+    // ERROR 3: Wildcard en ResponseEntity<?> (Maintainability - High)
+    UserEntity user = new UserEntity();
+    user.setId(System.currentTimeMillis());
+    user.setUsername("user_" + java.util.UUID.randomUUID().toString().substring(0, 8));
+    user.setPassword(passwordEncoder.encode(pass));
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
-				KEY_MESSAGE,       "Random user created",
-				KEY_ID,            saved.getId(),
-				KEY_USERNAME,      saved.getUsername(),
-				KEY_ACCESS_TOKEN,  accessToken,
-				KEY_REFRESH_TOKEN, refreshToken,
-				KEY_TOKEN_TYPE,    BEARER
-		));
-	}
+    UserEntity saved = userRepository.save(user);
+    String accessToken = jwtService.generateAccessToken(saved.getId());
+    String refreshToken = jwtService.generateRefreshToken(saved.getId());
+
+    return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
+            "message",      "Random user created",
+            "id",           saved.getId(),
+            "username",     saved.getUsername(),
+            "accessToken",  accessToken,
+            "refreshToken", refreshToken,
+            "tokenType",    "Bearer"
+    ));
+}
+
 }
