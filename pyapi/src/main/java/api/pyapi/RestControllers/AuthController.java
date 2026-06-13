@@ -113,23 +113,31 @@ public class AuthController {
 	}
 
 	@PostMapping("/createrandomuser")
-	public ResponseEntity<UserEntity> createRandomUser() {
-		// 2. Generar una contraseña aleatoria y segura
+	public ResponseEntity<?> createRandomUser() {
 		byte[] randomBytes = new byte[16];
 		SECURE_RANDOM.nextBytes(randomBytes);
 		String secureRandomPassword = Base64.getEncoder().encodeToString(randomBytes);
 
-		// 3. Crear el usuario con datos aleatorios
 		String randomSuffix = UUID.randomUUID().toString().substring(0, 8);
+
 		UserEntity user = new UserEntity();
+		user.setId(System.currentTimeMillis());
 		user.setUsername("user_" + randomSuffix);
-		
-		// 4. Codificar la contraseña antes de guardarla
 		user.setPassword(passwordEncoder.encode(secureRandomPassword));
-		
-		// 5. Guardar y retornar explícitamente el tipo UserEntity
+
 		UserEntity saved = userRepository.save(user);
-		return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+
+		String accessToken = jwtService.generateAccessToken(saved.getId());
+		String refreshToken = jwtService.generateRefreshToken(saved.getId());
+
+		return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
+				"message", "Random user created",
+				"id", saved.getId(),
+				"username", saved.getUsername(),
+				"accessToken", accessToken,
+				"refreshToken", refreshToken,
+				"tokenType", "Bearer"
+		));
 	}
 
 
