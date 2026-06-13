@@ -27,6 +27,15 @@ import java.util.Base64;
 @RequestMapping("/auth")
 public class AuthController {
 
+	// ✅ Constantes para evitar literales duplicados
+	private static final String KEY_MESSAGE       = "message";
+	private static final String KEY_ID            = "id";
+	private static final String KEY_USERNAME      = "username";
+	private static final String KEY_ACCESS_TOKEN  = "accessToken";
+	private static final String KEY_REFRESH_TOKEN = "refreshToken";
+	private static final String KEY_TOKEN_TYPE    = "tokenType";
+	private static final String BEARER            = "Bearer";
+
 	private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
 	private final UserRepository userRepository;
@@ -53,13 +62,13 @@ public class AuthController {
 		String refreshToken = jwtService.generateRefreshToken(saved.getId());
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
-				"message", "User created",
-				"id", saved.getId(),
-				"username", saved.getUsername(),
-				"accessToken", accessToken,
-				"refreshToken", refreshToken,
-				"tokenType", "Bearer"
-            ));
+				KEY_MESSAGE,       "User created",
+				KEY_ID,            saved.getId(),
+				KEY_USERNAME,      saved.getUsername(),
+				KEY_ACCESS_TOKEN,  accessToken,
+				KEY_REFRESH_TOKEN, refreshToken,
+				KEY_TOKEN_TYPE,    BEARER
+		));
 	}
 
 	@PostMapping("/login")
@@ -73,12 +82,12 @@ public class AuthController {
 		String refreshToken = jwtService.generateRefreshToken(user.getId());
 
 		return ResponseEntity.ok(Map.of(
-				"message", "Login successful",
-				"id", user.getId(),
-				"username", user.getUsername(),
-				"accessToken", accessToken,
-				"refreshToken", refreshToken,
-				"tokenType", "Bearer"
+				KEY_MESSAGE,       "Login successful",
+				KEY_ID,            user.getId(),
+				KEY_USERNAME,      user.getUsername(),
+				KEY_ACCESS_TOKEN,  accessToken,
+				KEY_REFRESH_TOKEN, refreshToken,
+				KEY_TOKEN_TYPE,    BEARER
 		));
 	}
 
@@ -105,10 +114,10 @@ public class AuthController {
 		String newRefreshToken = jwtService.generateRefreshToken(userId);
 
 		return ResponseEntity.ok(Map.of(
-				"message", "Token refreshed",
-				"accessToken", newAccessToken,
-				"refreshToken", newRefreshToken,
-				"tokenType", "Bearer"
+				KEY_MESSAGE,       "Token refreshed",
+				KEY_ACCESS_TOKEN,  newAccessToken,
+				KEY_REFRESH_TOKEN, newRefreshToken,
+				KEY_TOKEN_TYPE,    BEARER
 		));
 	}
 
@@ -130,14 +139,12 @@ public class AuthController {
 		String refreshToken = jwtService.generateRefreshToken(saved.getId());
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
-				"message",      "Random user created",
-				"id",           saved.getId(),
-				"username",     saved.getUsername(),
-				"accessToken",  accessToken,
-				"refreshToken", refreshToken,
-				"tokenType",    "Bearer"
+				KEY_MESSAGE,       "Random user created",
+				KEY_ID,            saved.getId(),
+				KEY_USERNAME,      saved.getUsername(),
+				KEY_ACCESS_TOKEN,  accessToken,
+				KEY_REFRESH_TOKEN, refreshToken,
+				KEY_TOKEN_TYPE,    BEARER
 		));
 	}
-
-
 }
