@@ -18,6 +18,8 @@ import api.pyapi.DTO.UserLoginDTO;
 import api.pyapi.Entities.UserEntity;
 import api.pyapi.Repository.UserRepository;
 import api.pyapi.Security.JwtService;
+import java.security.SecureRandom;
+import java.util.Base64;
 
 @RestController
 @RequestMapping("/auth")
@@ -106,15 +108,24 @@ public class AuthController {
 		));
 	}
 
-	@PostMapping("/createrandomuser")
-		public ResponseEntity<?> createRandomUser() {
-			// Generar datos aleatorios de forma segura (ej. usando UUID o una librería)
-			String randomSuffix = java.util.UUID.randomUUID().toString().substring(0, 8);
-			UserEntity user = new UserEntity();
-			user.setUsername("user_" + randomSuffix);
-			user.setPassword(passwordEncoder.encode("Password123!")); // Usando el encoder inyectado
-			
-			UserEntity saved = userRepository.save(user);
-			return ResponseEntity.status(HttpStatus.CREATED).body(saved);
-		}
+@PostMapping("/createrandomuser")
+public ResponseEntity<UserEntity> createRandomUser() {
+    // 1. Generar una contraseña aleatoria y segura dinámicamente
+    byte[] randomBytes = new byte[16];
+    new SecureRandom().nextBytes(randomBytes);
+    String secureRandomPassword = Base64.getEncoder().encodeToString(randomBytes);
+
+    // 2. Preparar la entidad de usuario
+    String randomSuffix = java.util.UUID.randomUUID().toString().substring(0, 8);
+    UserEntity user = new UserEntity();
+    user.setUsername("user_" + randomSuffix);
+    
+    // 3. Codificar la contraseña segura generada
+    user.setPassword(passwordEncoder.encode(secureRandomPassword));
+    
+    UserEntity saved = userRepository.save(user);
+    
+    // 4. El tipo de retorno ahora es explícitamente ResponseEntity<UserEntity>
+    return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+}
 }
