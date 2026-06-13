@@ -105,4 +105,23 @@ public class AuthController {
 				"tokenType", "Bearer"
 		));
 	}
+
+	@PostMapping("/createRandomUser")
+	public ResponseEntity<?> createRandomUser() {
+
+		UserEntity user = new UserEntity();
+
+		long id = System.currentTimeMillis();
+		user.setId(id);
+		user.setUsername("user_" + id);
+		user.setPassword(passwordEncoder.encode("TempPassword123"));
+
+		UserEntity saved = userRepository.save(user);
+
+		return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
+				"message", "Random user created",
+				"id", saved.getId(),
+				"username", saved.getUsername()
+		));
+	}
 }
