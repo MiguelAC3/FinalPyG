@@ -113,7 +113,7 @@ public class AuthController {
 	}
 
 	@PostMapping("/createrandomuser")
-	public ResponseEntity<?> createRandomUser() {
+	public ResponseEntity<Map<String, Object>> createRandomUser() {
 		byte[] randomBytes = new byte[16];
 		SECURE_RANDOM.nextBytes(randomBytes);
 		String secureRandomPassword = Base64.getEncoder().encodeToString(randomBytes);
@@ -126,17 +126,16 @@ public class AuthController {
 		user.setPassword(passwordEncoder.encode(secureRandomPassword));
 
 		UserEntity saved = userRepository.save(user);
-
 		String accessToken = jwtService.generateAccessToken(saved.getId());
 		String refreshToken = jwtService.generateRefreshToken(saved.getId());
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
-				"message", "Random user created",
-				"id", saved.getId(),
-				"username", saved.getUsername(),
-				"accessToken", accessToken,
+				"message",      "Random user created",
+				"id",           saved.getId(),
+				"username",     saved.getUsername(),
+				"accessToken",  accessToken,
 				"refreshToken", refreshToken,
-				"tokenType", "Bearer"
+				"tokenType",    "Bearer"
 		));
 	}
 
