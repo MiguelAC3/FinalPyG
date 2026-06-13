@@ -1,6 +1,7 @@
 package api.pyapi.RestControllers;
 
 import java.util.Map;
+import java.util.UUID;
 
 import jakarta.validation.Valid;
 
@@ -21,9 +22,12 @@ import api.pyapi.Security.JwtService;
 import java.security.SecureRandom;
 import java.util.Base64;
 
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
+
+	private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
@@ -110,22 +114,21 @@ public class AuthController {
 
 @PostMapping("/createrandomuser")
 public ResponseEntity<UserEntity> createRandomUser() {
-    // 1. Generar una contraseña aleatoria y segura dinámicamente
+    // 2. Generar una contraseña aleatoria y segura
     byte[] randomBytes = new byte[16];
-    new SecureRandom().nextBytes(randomBytes);
+    SECURE_RANDOM.nextBytes(randomBytes);
     String secureRandomPassword = Base64.getEncoder().encodeToString(randomBytes);
 
-    // 2. Preparar la entidad de usuario
-    String randomSuffix = java.util.UUID.randomUUID().toString().substring(0, 8);
+    // 3. Crear el usuario con datos aleatorios
+    String randomSuffix = UUID.randomUUID().toString().substring(0, 8);
     UserEntity user = new UserEntity();
     user.setUsername("user_" + randomSuffix);
     
-    // 3. Codificar la contraseña segura generada
+    // 4. Codificar la contraseña antes de guardarla
     user.setPassword(passwordEncoder.encode(secureRandomPassword));
     
+    // 5. Guardar y retornar explícitamente el tipo UserEntity
     UserEntity saved = userRepository.save(user);
-    
-    // 4. El tipo de retorno ahora es explícitamente ResponseEntity<UserEntity>
     return ResponseEntity.status(HttpStatus.CREATED).body(saved);
 }
 }
