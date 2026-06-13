@@ -1,4 +1,4 @@
-package api.pyapi.DTO;
+package api.pyapi.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;

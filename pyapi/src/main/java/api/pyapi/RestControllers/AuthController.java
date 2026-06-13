@@ -16,12 +16,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import api.pyapi.DTO.SignupDTO;
-import api.pyapi.DTO.RefreshTokenDTO;
-import api.pyapi.DTO.UserLoginDTO;
 import api.pyapi.Entities.UserEntity;
 import api.pyapi.Repository.UserRepository;
 import api.pyapi.Security.JwtService;
+import api.pyapi.dto.RefreshTokenDTO;
+import api.pyapi.dto.SignupDTO;
+import api.pyapi.dto.UserLoginDTO;
 
 @RestController
 @RequestMapping("/auth")
