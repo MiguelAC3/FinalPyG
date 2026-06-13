@@ -105,36 +105,4 @@ public class AuthController {
 				"tokenType", "Bearer"
 		));
 	}
-
-@PostMapping("/createrandomuser")
-public ResponseEntity<?> createRandomUser() {
-
-    // ERROR 1: Contraseña hardcodeada (Security - Blocker)
-    String pass = "Password123!";
-
-    // ERROR 2: SecureRandom instanciado dentro del método (Reliability - High)
-    java.security.SecureRandom random = new java.security.SecureRandom();
-    byte[] bytes = new byte[16];
-    random.nextBytes(bytes);
-
-    // ERROR 3: Wildcard en ResponseEntity<?> (Maintainability - High)
-    UserEntity user = new UserEntity();
-    user.setId(System.currentTimeMillis());
-    user.setUsername("user_" + java.util.UUID.randomUUID().toString().substring(0, 8));
-    user.setPassword(passwordEncoder.encode(pass));
-
-    UserEntity saved = userRepository.save(user);
-    String accessToken = jwtService.generateAccessToken(saved.getId());
-    String refreshToken = jwtService.generateRefreshToken(saved.getId());
-
-    return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
-            "message",      "Random user created",
-            "id",           saved.getId(),
-            "username",     saved.getUsername(),
-            "accessToken",  accessToken,
-            "refreshToken", refreshToken,
-            "tokenType",    "Bearer"
-    ));
-}
-
 }
